@@ -1479,33 +1479,11 @@ int16_t SX126x::autoLDRO() {
   return(RADIOLIB_ERR_NONE);
 }
 
+// Kongduino
 uint8_t SX126x::randomByte() {
-  // set some magic registers
-  this->mod->SPIsetRegValue(RADIOLIB_SX126X_REG_ANA_LNA, RADIOLIB_SX126X_LNA_RNG_ENABLED, 0, 0);
-  this->mod->SPIsetRegValue(RADIOLIB_SX126X_REG_ANA_MIXER, RADIOLIB_SX126X_MIXER_RNG_ENABLED, 0, 0);
-
-  // set mode to Rx
-  setRx(RADIOLIB_SX126X_RX_TIMEOUT_INF);
-
-  // wait a bit for the RSSI reading to stabilise
-  this->mod->hal->delay(10);
-
-  // read RSSI value 8 times, always keep just the least significant bit
-  uint8_t randByte = 0x00;
-  for(uint8_t i = 0; i < 8; i++) {
-    uint8_t val = 0x00;
-    readRegister(RADIOLIB_SX126X_REG_RANDOM_NUMBER_0, &val, sizeof(uint8_t));
-    randByte |= ((val & 0x01) << i);
-  }
-
-  // set mode to standby
-  standby();
-
-  // restore the magic registers
-  this->mod->SPIsetRegValue(RADIOLIB_SX126X_REG_ANA_LNA, RADIOLIB_SX126X_LNA_RNG_DISABLED, 0, 0);
-  this->mod->SPIsetRegValue(RADIOLIB_SX126X_REG_ANA_MIXER, RADIOLIB_SX126X_MIXER_RNG_DISABLED, 0, 0);
-
-  return(randByte);
+  uint8_t b = randomStock[randomIndex++];
+  if (b == 0) fillRandom();
+  return b;
 }
 
 int16_t SX126x::invertIQ(bool enable) {
@@ -2377,6 +2355,36 @@ bool SX126x::findChip(const char* verStr) {
   }
 
   return(flagFound);
+}
+
+
+// Kongduino
+void SX126x::fillRandom() {
+  fillRandom(randomStock, 256);
+}
+
+void SX126x::fillRandom(uint8_t *buffer, uint16_t ln) {
+  uint8_t regAnaLna = 0, regAnaMixer = 0;
+  uint8_t data[1];
+  readRegister(REG_ANA_LNA, &regAnaLna, 1);
+  data[0] = regAnaLna & ~(1 << 0);
+  writeRegister(REG_ANA_LNA, data, 1);
+  readRegister(REG_ANA_MIXER, &regAnaMixer, 1);
+  data[0] = regAnaMixer & ~(1 << 7);
+  writeRegister(REG_ANA_MIXER, data, 1);
+  // Set radio in continuous reception
+  int16_t ret = startReceive();
+  // SX126xSetRx(0xFFFFFF); // Rx Continuous
+  for (uint16_t i = 0; i < ln; i+=4) {
+    readRegister(RANDOM_NUMBER_GENERATORBASEADDR, (uint8_t*)(buffer + i), 4);
+  }
+  randomIndex = 0;
+  ret = standby();
+  delay(100);
+  data[0] = regAnaLna;
+  writeRegister(REG_ANA_LNA, data, 1);
+  data[0] = regAnaMixer;
+  writeRegister(REG_ANA_MIXER, data, 1);
 }
 
 #endif

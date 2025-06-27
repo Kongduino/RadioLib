@@ -1194,6 +1194,16 @@ class SX126x: public PhysicalLayer {
     */
     int16_t setPaRampTime(uint8_t rampTime);
 
+// Kongduino
+  #define RANDOM_NUMBER_GENERATORBASEADDR 0x0819
+  #define REG_ANA_LNA 0x08E2
+  #define REG_ANA_MIXER 0x08E5
+  uint8_t randomStock[256];
+  uint8_t randomIndex = 0;
+  void fillRandom();
+  void fillRandom(uint8_t*, uint16_t);
+
+
 #if !RADIOLIB_GODMODE && !RADIOLIB_LOW_LEVEL
   protected:
 #endif
