@@ -2363,6 +2363,7 @@ void SX126x::fillRandom() {
   fillRandom(randomStock, 256);
 }
 
+// Kongduino
 void SX126x::fillRandom(uint8_t *buffer, uint16_t ln) {
   uint8_t regAnaLna = 0, regAnaMixer = 0;
   uint8_t data[1];
