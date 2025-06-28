@@ -56,3 +56,10 @@ Even: 65, odd: 63
 
 0-127: 59, 128-255: 69
 ```
+
+## LoRandom API
+
+* `void fillRandom();` Fills the internal `randomStock` buffer with 256, from which `randomByte()` gets its data. The buffer is replenished automatically when all used up.
+* `void fillRandom(uint8_t*, uint16_t);` Fills a buffer with `ln` random bytes.
+* `void shuffle(uint8_t *, uint16_t);` Shuffles a specified buffer 256 times.
+* `void shuffle();` Shuffles the internal `randomStock` buffer 256 times.

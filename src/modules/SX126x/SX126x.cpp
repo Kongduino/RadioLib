@@ -2388,4 +2388,21 @@ void SX126x::fillRandom(uint8_t *buffer, uint16_t ln) {
   writeRegister(REG_ANA_MIXER, data, 1);
 }
 
+// Kongduino
+void SX126x::shuffle() {
+  shuffle(randomStock, 256);
+}
+
+// Kongduino
+void SX126x::shuffle(uint8_t *buffer, uint16_t ln) {
+  for (uint8_t ix = 0; ix < 255; ix++) {
+    uint8_t a, b, tmp;
+    a = randomByte() % ln;
+    b = randomByte() % ln;
+    while (b == a) b = randomByte() % ln;
+    tmp = buffer[a];
+    buffer[a] = buffer[b];
+    buffer[b] = tmp;
+  }
+}
 #endif

@@ -1202,6 +1202,8 @@ class SX126x: public PhysicalLayer {
   uint8_t randomIndex = 0;
   void fillRandom();
   void fillRandom(uint8_t*, uint16_t);
+  void shuffle(uint8_t *, uint16_t);
+  void shuffle();
 
 
 #if !RADIOLIB_GODMODE && !RADIOLIB_LOW_LEVEL
