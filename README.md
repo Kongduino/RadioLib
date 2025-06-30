@@ -101,3 +101,28 @@ SX127x, RFM9x, SX126x, LR11x0 and SX128x
   * [__EFR32__](https://github.com/SiliconLabs/arduino) - Silicon Labs xG24, xG27 and other boards
 
 The list above is by no means exhaustive - RadioLib code is independent of the used platform! Compilation of all examples is tested for all platforms officially supported prior to releasing new version. In addition, RadioLib includes an internal hardware abstraction layer, which allows it to be easily ported even to non-Arduino environments.
+
+### RNG
+
+I (ie [Kongduino](https://github.com/Kongduino)) am adding proper LoRa-based RNG for LoRa-based products. For now, it's available for:
+
+* SX127X (EOL line of LoRa modems)
+* SX126x (Current range, but could become EOL, or at least deprecated)
+
+Work derived from my [LoRandom](https://github.com/Kongduino/LoRandom) [series](https://github.com/Kongduino/Sx1262LoRandom).
+
+#### API
+
+```c
+  void fillRandom();
+  void fillRandom(uint8_t*, uint16_t);
+  uint8_t randomByte(); // Existing API call, code changed/
+```
+
+#### nRF52840
+
+For this MCU, it would be easy to add another source of RNG via its CC310 chip. There's already a lib for this, [my fork](https://github.com/Kongduino/Adafruit_nRFCrypto) provides not only hash and RNG, but AES and Chacha too.
+
+#### Examples
+
+There's an example sketch each for SX1276 and SX1262.
