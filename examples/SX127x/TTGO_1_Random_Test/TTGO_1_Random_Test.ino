@@ -1,6 +1,6 @@
 /*
   RadioLib SX127x Settings Example
-
+  https://randomnerdtutorials.com/ttgo-lora32-sx1276-arduino-ide/
   This example shows how to change all the properties of LoRa transmission.
   RadioLib currently supports the following settings:
   - pins (SPI slave select, digital IO 0, digital IO 1)
@@ -45,6 +45,19 @@ SX1276 radio1 = new Module(SS, DI0, RST, 0);
 #include <RadioBoards.h>
 Radio radio3 = new RadioModule();
 */
+
+void shuffle(uint8_t *buffer, uint16_t ln) {
+  for (uint8_t ix = 0; ix < 255; ix++) {
+    uint8_t a, b, tmp;
+    a = radio1.randomByte() % ln;
+    b = radio1.randomByte() % ln;
+    while (b == a) b = radio1.randomByte() % ln;
+    tmp = buffer[a];
+    buffer[a] = buffer[b];
+    buffer[b] = tmp;
+  }
+}
+
 
 void setup() {
   Serial.begin(115200);
@@ -149,6 +162,9 @@ void loop() {
   uint8_t buffer[49];
   Serial.print("\n\nRandom Buffer()\n");
   radio1.fillRandom(buffer, 49);
+  hexDump(buffer, 49);
+  shuffle(buffer, 49);
+  Serial.print("\n\nShuffle\n");
   hexDump(buffer, 49);
   radio1.fillRandom();
   uint8_t odd = 0, even = 0, below128 = 0, over127 = 0;

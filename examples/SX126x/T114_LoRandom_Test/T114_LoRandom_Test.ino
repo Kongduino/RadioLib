@@ -93,7 +93,7 @@ void loop() {
   for (uint8_t i = 0; i < 128; i += 4) {
     uint8_t x = radio.randomByte();
     if (x & 1 == 1) odd++;
-    else even++;
+    else even++;x
     if (x < 128) below128++;
     else over127++;
     tft.drawPixel(x, i, ST77XX_BLACK);
