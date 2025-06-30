@@ -2361,6 +2361,7 @@ bool SX126x::findChip(const char* verStr) {
 // Kongduino
 void SX126x::fillRandom() {
   fillRandom(randomStock, 256);
+  randomIndex = 0;
 }
 
 // Kongduino
@@ -2379,7 +2380,6 @@ void SX126x::fillRandom(uint8_t *buffer, uint16_t ln) {
   for (uint16_t i = 0; i < ln; i+=4) {
     readRegister(RANDOM_NUMBER_GENERATORBASEADDR, (uint8_t*)(buffer + i), 4);
   }
-  randomIndex = 0;
   ret = standby();
   delay(100);
   data[0] = regAnaLna;
@@ -2388,21 +2388,4 @@ void SX126x::fillRandom(uint8_t *buffer, uint16_t ln) {
   writeRegister(REG_ANA_MIXER, data, 1);
 }
 
-// Kongduino
-void SX126x::shuffle() {
-  shuffle(randomStock, 256);
-}
-
-// Kongduino
-void SX126x::shuffle(uint8_t *buffer, uint16_t ln) {
-  for (uint8_t ix = 0; ix < 255; ix++) {
-    uint8_t a, b, tmp;
-    a = randomByte() % ln;
-    b = randomByte() % ln;
-    while (b == a) b = randomByte() % ln;
-    tmp = buffer[a];
-    buffer[a] = buffer[b];
-    buffer[b] = tmp;
-  }
-}
 #endif

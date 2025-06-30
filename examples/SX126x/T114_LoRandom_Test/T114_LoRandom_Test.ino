@@ -35,6 +35,18 @@ Adafruit_ST7789 tft = Adafruit_ST7789(&SPI1, PIN_TFT_CS, PIN_TFT_DC, PIN_TFT_RST
 // BUSY pin:  9
 SX1262 radio = new Module(SX126X_CS, SX126X_DIO1, SX126X_RESET, SX126X_BUSY);
 
+void shuffle(uint8_t *buffer, uint16_t ln) {
+  for (uint8_t ix = 0; ix < 255; ix++) {
+    uint8_t a, b, tmp;
+    a = radio.randomByte() % ln;
+    b = radio.randomByte() % ln;
+    while (b == a) b = radio.randomByte() % ln;
+    tmp = buffer[a];
+    buffer[a] = buffer[b];
+    buffer[b] = tmp;
+  }
+}
+
 void setup() {
   Serial.begin(115200);
   for (uint8_t i = 0; i < 5; i++) {
@@ -68,11 +80,14 @@ void setup() {
 void loop() {
   tft.fillScreen(ST77XX_GREEN);
   delay(200);
-  tft.fillScreen(ST77XX_BLACK);
+  tft.fillScreen(ST77XX_WHITE);
   uint8_t buffer[49];
+  Serial.print("\n\nRandom Buffer()\n");
   radio.fillRandom(buffer, 49);
   hexDump(buffer, 49);
-  Serial.print("\n\nrandomByte()\n");
+  shuffle(buffer, 49);
+  Serial.print("\n\nShuffle\n");
+  hexDump(buffer, 49);
   radio.fillRandom();
   uint8_t odd = 0, even = 0, below128 = 0, over127 = 0;
   for (uint8_t i = 0; i < 128; i += 4) {
@@ -81,29 +96,29 @@ void loop() {
     else even++;
     if (x < 128) below128++;
     else over127++;
-    tft.drawPixel(x, i, ST77XX_WHITE);
-    Serial.printf("randomByte: 0x%02x ", x);
+    tft.drawPixel(x, i, ST77XX_BLACK);
+    Serial.printf("radio.randomByte: 0x%02x ", x);
     x = radio.randomByte();
     if (x & 1 == 1) odd++;
     else even++;
     if (x < 128) below128++;
     else over127++;
     tft.drawPixel(x, i + 1, ST77XX_RED);
-    Serial.printf("randomByte: 0x%02x ", x);
+    Serial.printf("radio.randomByte: 0x%02x ", x);
     x = radio.randomByte();
     if (x & 1 == 1) odd++;
     else even++;
     if (x < 128) below128++;
     else over127++;
-    tft.drawPixel(x, i + 2, ST77XX_YELLOW);
-    Serial.printf("randomByte: 0x%02x ", x);
+    tft.drawPixel(x, i + 2, ST77XX_GREEN);
+    Serial.printf("radio.randomByte: 0x%02x ", x);
     x = radio.randomByte();
     if (x & 1 == 1) odd++;
     else even++;
     if (x < 128) below128++;
     else over127++;
     tft.drawPixel(x, i + 3, ST77XX_BLUE);
-    Serial.printf("randomByte: 0x%02x\n", x);
+    Serial.printf("radio.randomByte: 0x%02x\n", x);
   }
   Serial.printf("\n\nEven: %d, odd: %d\n\n", even, odd);
   Serial.printf("0-127: %d, 128-255: %d\n\n", below128, over127);
