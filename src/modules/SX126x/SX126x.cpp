@@ -1482,7 +1482,7 @@ int16_t SX126x::autoLDRO() {
 // Kongduino
 uint8_t SX126x::randomByte() {
   uint8_t b = randomStock[randomIndex++];
-  if (b == 0) fillRandom();
+  if (randomIndex == 0) fillRandom();
   return b;
 }
 
