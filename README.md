@@ -107,7 +107,9 @@ The list above is by no means exhaustive - RadioLib code is independent of the u
 I (ie [Kongduino](https://github.com/Kongduino)) am adding proper LoRa-based RNG for LoRa-based products. For now, it's available for:
 
 * SX127X (EOL line of LoRa modems)
+* RF69 -- Code is almost identical to SX127x: it extracts LSB from RSSI and applies a von Neumann extractor.
 * SX126x (Current range, but could become EOL, or at least deprecated)
+  The code differs a little from the modules above, as the SX126x "pre-bakes" random numbers.
 
 Work derived from my [LoRandom](https://github.com/Kongduino/LoRandom) [series](https://github.com/Kongduino/Sx1262LoRandom).
 
@@ -116,7 +118,7 @@ Work derived from my [LoRandom](https://github.com/Kongduino/LoRandom) [series](
 ```c
   void fillRandom();
   void fillRandom(uint8_t*, uint16_t);
-  uint8_t randomByte(); // Existing API call, code changed/
+  uint8_t randomByte(); // Existing API call, code changed. It fetches a byte from randomBuffer, and refills it if needed.
 ```
 
 #### nRF52840

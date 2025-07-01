@@ -1001,6 +1001,12 @@ class RF69: public PhysicalLayer {
     */
     int16_t setDIOMapping(uint32_t pin, uint32_t value) override;
 
+
+// Kongduino
+  void fillRandom();
+  void fillRandom(uint8_t*, uint16_t);
+ 
+
 #if !RADIOLIB_GODMODE && !RADIOLIB_LOW_LEVEL
   protected:
 #endif
@@ -1037,6 +1043,13 @@ class RF69: public PhysicalLayer {
     int16_t setPacketMode(uint8_t mode, uint8_t len);
     void clearIRQFlags();
     void clearFIFO(size_t count);
+  
+  // Kongduino
+  uint8_t randomStock[256];
+  uint8_t randomIndex = 0;
+  uint8_t getLoRandomByte();
+  void setupLoRandom();
+  void resetLoRa();
 };
 
 #endif

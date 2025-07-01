@@ -946,23 +946,11 @@ void RF69::setRfSwitchTable(const uint32_t (&pins)[Module::RFSWITCH_MAX_PINS], c
   this->mod->setRfSwitchTable(pins, table);
 }
 
+// Kongduino
 uint8_t RF69::randomByte() {
-  // set mode to Rx
-  setMode(RADIOLIB_RF69_RX);
-
-  // wait a bit for the RSSI reading to stabilise
-  this->mod->hal->delay(10);
-
-  // read RSSI value 8 times, always keep just the least significant bit
-  uint8_t randByte = 0x00;
-  for(uint8_t i = 0; i < 8; i++) {
-    randByte |= ((this->mod->SPIreadRegister(RADIOLIB_RF69_REG_RSSI_VALUE) & 0x01) << i);
-  }
-
-  // set mode to standby
-  setMode(RADIOLIB_RF69_STANDBY);
-
-  return(randByte);
+  uint8_t b = randomStock[randomIndex++];
+  if (randomIndex == 0) fillRandom();
+  return b;
 }
 
 #if !RADIOLIB_EXCLUDE_DIRECT_RECEIVE
@@ -1084,6 +1072,50 @@ void RF69::clearFIFO(size_t count) {
     this->mod->SPIreadRegister(RADIOLIB_RF69_REG_FIFO);
     count--;
   }
+}
+
+// Kongduino
+void RF69::setupLoRandom() {
+  // set mode to Rx
+  setMode(RADIOLIB_RF69_RX);
+  // wait a bit for the RSSI reading to stabilise
+  this->mod->hal->delay(10);
+}
+
+// Kongduino
+void RF69::resetLoRa() {
+  // set mode to standby
+  setMode(RADIOLIB_RF69_STANDBY);
+}
+
+// Kongduino
+uint8_t RF69::getLoRandomByte() {
+  // read RSSI value 8 times, keeping the least significant bit
+  // while applying a von Neumann extractor.
+  uint8_t randByte = 0, b;
+  for (uint8_t j = 0; j < 8; j++) {
+    b = this->mod->SPIreadRegister(RADIOLIB_RF69_REG_RSSI_VALUE) & 0x01;
+    while (b == this->mod->SPIreadRegister(RADIOLIB_RF69_REG_RSSI_VALUE) & 0x01) {
+      b = this->mod->SPIreadRegister(RADIOLIB_RF69_REG_RSSI_VALUE) & 0x01;
+    }
+    randByte = (randByte << 1) | b;
+  }
+  return(randByte);
+}
+
+
+void RF69::fillRandom() {
+  fillRandom(randomStock, 256);
+  randomIndex = 0;
+}
+
+// Kongduino
+void RF69::fillRandom(uint8_t *buffer, uint16_t ln) {
+  setupLoRandom();
+  for (uint16_t i = 0; i < ln; i++) {
+    buffer[i] = getLoRandomByte();
+  }
+  resetLoRa();
 }
 
 #endif
